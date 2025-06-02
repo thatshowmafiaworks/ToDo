@@ -1,15 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
+﻿using MongoFramework;
+using ToDo.Api.Models;
 
 namespace ToDo.Api.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser<ObjectId>, IdentityRole<ObjectId>, ObjectId>
+    public class ApplicationDbContext : MongoDbContext
     {
-        public ApplicationDbContext(DbContextOptions options) : base(options)
+        public ApplicationDbContext(IMongoDbConnection connection) : base(connection)
         {
         }
 
+        public MongoDbSet<Todo> Todos { get; set; }
+
+        protected override void OnConfigureMapping(MappingBuilder mappingBuilder)
+        {
+            mappingBuilder.Entity<Todo>()
+                .ToCollection("Todos");
+        }
     }
 }
