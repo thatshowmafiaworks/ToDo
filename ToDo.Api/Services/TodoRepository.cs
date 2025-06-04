@@ -1,5 +1,5 @@
 ﻿using MongoDB.Bson;
-using MongoFramework.Linq;
+using MongoDB.Driver;
 using ToDo.Api.Data;
 using ToDo.Api.Models;
 
@@ -9,22 +9,20 @@ namespace ToDo.Api.Services
         ApplicationDbContext db
         )
     {
-        public async Task<List<Todo>> GetAll() => await db.Todos.ToListAsync();
-        public async Task<Todo> Get(ObjectId id) => await db.Todos.FindAsync(id);
+        public async Task<List<Todo>> GetAll() => await db.Todos.Find(x => x.UserId == x.UserId).ToListAsync();
+        public async Task<Todo> Get(ObjectId id) => await db.Todos.Find(x => x.Id == id).FirstAsync();
         public async Task Create(Todo todo)
         {
-            db.Todos.Add(todo);
-            await db.SaveChangesAsync();
+            await db.Todos.InsertOneAsync(todo);
+
         }
         public async Task Update(Todo todo)
         {
-            db.Todos.Update(todo);
-            await db.SaveChangesAsync();
+            await db.Todos.ReplaceOneAsync(x => x.Id == todo.Id, todo);
         }
         public async Task Delete(Todo todo)
         {
-            db.Todos.Remove(todo);
-            await db.SaveChangesAsync();
+            await db.Todos.DeleteOneAsync(x => x.Id == todo.Id);
         }
     }
 }

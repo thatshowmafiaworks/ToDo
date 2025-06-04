@@ -1,20 +1,17 @@
-﻿using MongoFramework;
+﻿using MongoDB.Driver;
 using ToDo.Api.Models;
 
 namespace ToDo.Api.Data
 {
-    public class ApplicationDbContext : MongoDbContext
+    public class ApplicationDbContext
     {
-        public ApplicationDbContext(IMongoDbConnection connection) : base(connection)
+        private readonly IMongoDatabase _db;
+        public ApplicationDbContext(IConfiguration config)
         {
+            var client = new MongoClient(config["MongoDbConnectionString"]);
+            _db = client.GetDatabase(config["MongoDbName"]);
         }
 
-        public MongoDbSet<Todo> Todos { get; set; }
-
-        protected override void OnConfigureMapping(MappingBuilder mappingBuilder)
-        {
-            mappingBuilder.Entity<Todo>()
-                .ToCollection("Todos");
-        }
+        public IMongoCollection<Todo> Todos => _db.GetCollection<Todo>("Todos");
     }
 }

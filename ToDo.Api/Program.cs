@@ -2,7 +2,6 @@ using AspNetCore.Identity.Mongo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
-using MongoFramework;
 using Serilog;
 using System.Text;
 using ToDo.Api.Data;
@@ -21,13 +20,6 @@ builder.Logging.AddSerilog(
         .WriteTo.File("Log/log-.txt", rollingInterval: RollingInterval.Day)
         .CreateLogger()
 );
-//builder.Services.AddDbContext<ApplicationDbContext>(opts
-//    => opts.UseMongoDB(
-//        builder.Configuration["MongoDbConnectionString"] ?? "",
-//        builder.Configuration["MongoDbName"] ?? ""));
-
-builder.Services.AddSingleton<IMongoDbConnection>(sp
-    => MongoDbConnection.FromConnectionString(builder.Configuration["MongoDbConnectionString"] ?? ""));
 
 builder.Services.AddScoped<ApplicationDbContext>();
 
@@ -43,7 +35,7 @@ builder.Services.AddIdentityMongoDbProvider<AppUser, AppRole, ObjectId>(identity
 },
 mongo =>
 {
-    mongo.ConnectionString = builder.Configuration["dbtest"];
+    mongo.ConnectionString = builder.Configuration["MongoDbConnectionString"] ?? "";
 });
 
 builder.Services.AddAuthentication(opts =>
